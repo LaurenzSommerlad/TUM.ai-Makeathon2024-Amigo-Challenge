@@ -44,3 +44,9 @@ Alternatively you are free to utilize the full functionalities of the feature-cl
 https://featurecloud.ai/developers
 
 ```
+
+# How to run this application with docker-compose. 
+
+```docker-compose up -d ```
+
+This command performs similar actions to the previous lengthy Docker command. It builds the Docker image and tags it as featurecloud.ai/dreamteam:latest, sets up local volume mappings, and opens the corresponding ports.
