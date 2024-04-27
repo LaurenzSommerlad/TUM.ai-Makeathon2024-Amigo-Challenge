@@ -27,7 +27,9 @@ pip install -r requirements.txt
 make build
 
 # to do a test run of your container with the following statement. In the logs you should see a server starting. When using Windows bases Systems we recognized mounting works better when triggering command directly in WSL System. 
-docker run -d -v ./config.yml:/mnt/input/config.yml -v ./data/output:/mnt/output -p 9000:9000 featurecloud.ai/<care-for-rare-submission name>:latest
+docker run -d -v ./config.yml:/mnt/input/config.yml -v ./data/output:/mnt/output -p 9000:9000 featurecloud.ai/dreamteam:latest
+# or on Windows:
+docker run -d -v ${pwd}/config.yml:/mnt/input/config.yml -v ${pwd}/data/output:/mnt/output -p 9000:9000 featurecloud.ai/dreamteam:latest
 
 # Trigger the start of the application states
 curl --location 'http://localhost:9000/setup' --header 'Content-Type: application/json' --data '{"id": "0000000000000000","coordinator": false,"coordinatorID": "0000000000000000","clients": []}'
@@ -42,3 +44,9 @@ Alternatively you are free to utilize the full functionalities of the feature-cl
 https://featurecloud.ai/developers
 
 ```
+
+# How to run this application with docker-compose. 
+
+```docker-compose up -d ```
+
+This command performs similar actions to the previous lengthy Docker command. It builds the Docker image and tags it as featurecloud.ai/dreamteam:latest, sets up local volume mappings, and opens the corresponding ports.
