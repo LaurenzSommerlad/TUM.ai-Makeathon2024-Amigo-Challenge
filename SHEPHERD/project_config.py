@@ -1,8 +1,10 @@
 from pathlib import Path
+import os
 
-
-PROJECT_DIR = Path('PATH/TO/SHEPHERD')
-CURR_KG = '8.9.21_kg' 
+full_path = os.path.realpath(__file__)
+path, _ = os.path.split(full_path)
+PROJECT_DIR = Path(path)
+CURR_KG = '8.9.21_kg'
 KG_DIR = PROJECT_DIR / 'knowledge_graph' / CURR_KG
 PREDICT_RESULTS_DIR = PROJECT_DIR / 'results'
 SEED = 33
