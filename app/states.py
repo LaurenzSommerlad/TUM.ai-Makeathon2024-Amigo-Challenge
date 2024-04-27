@@ -68,7 +68,21 @@ class ExecuteState(AppState):
 
         
     def run(self):
+        ## Retriving Phenotypes
+        pheno_data = request("""
+MATCH (:Biological_sample)-[:HAS_PHENOTYPE]->(ph:Phenotype)
+RETURN DISTINCT ph.id AS phenotype
+""", lambda data: [r["phenotype"] for r in data])
+        assert pheno_data
+        mlb_pheno = MultiLabelBinarizer()
+        mlb_pheno.fit_transform(pheno_data)
         
+        
+        # Get Neo4j credentials from config
+        # print("Gotten to credentials part")
+        
+        # Driver instantiation
+
         # Get Neo4j credentials from config
         # print("Gotten to credentials part")
         
@@ -79,7 +93,7 @@ class ExecuteState(AppState):
 MATCH (b:Biological_sample)
 WHERE NOT (b:Biological_sample)-[:HAS_DISEASE]->()
 OPTIONAL MATCH (b:Biological_sample)-[:HAS_PHENOTYPE]->(ph:Phenotype)
-RETURN b.subjectid as subjectid, collect(DISTINCT ph.id) AS phenotypes
+RETURN b.subjectid as subject_id, collect(DISTINCT ph.id) AS phenotypes
 
 """,
             lambda data: [{
@@ -89,8 +103,7 @@ RETURN b.subjectid as subjectid, collect(DISTINCT ph.id) AS phenotypes
         ) 
         
         data_test = pd.DataFrame(delta_test)
-        pheno_encoded_test = mlb_pheno.fit_transform(data_test['pheno_type'])
-        df_pheno_encoded_test = pd.DataFrame(pheno_encoded_test, columns=mlb_pheno.classes_)
+        df_pheno_encoded_test = pd.DataFrame(data_test['pheno_type'], columns=mlb_pheno.classes_)
         df_final_test = pd.concat([data_test[['subject_id']], df_pheno_encoded_test], axis=1)
         df_test = df_final_test
         X_test = df_test.drop(['subject_id'], axis=1)
@@ -120,9 +133,7 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
         )
 
         data = pd.DataFrame(delta)
-        mlb_pheno = MultiLabelBinarizer()
-        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
-        df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
+        df_pheno_encoded = pd.DataFrame(data['pheno_type'], columns=mlb_pheno.classes_)
         df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
     
         logging.info("Data processed")
@@ -173,7 +184,7 @@ MATCH (b:Biological_sample)
 
         data = pd.DataFrame(delta)
 
-        mlb_pheno = MultiLabelBinarizer()
+        #mlb_pheno = MultiLabelBinarizer()
         pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
         df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
         df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
