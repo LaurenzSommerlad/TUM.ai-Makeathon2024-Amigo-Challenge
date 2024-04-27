@@ -10,7 +10,8 @@ from sklearn.metrics import classification_report, accuracy_score
 from sklearn.preprocessing import LabelEncoder
 
 type = 1
-data = main(type=type)
+json_data,data = main(type=type)
+
 df = process_data(data)
 # df.head()
 

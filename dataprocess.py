@@ -13,7 +13,9 @@ def fetch_data(session, query):
         phenotype = record['phenotypes']
         protein = record['proteins']
         data.append({"subject_id": subject_id,"pheno_type":phenotype,"protien":protein, "disease": disease_status})
-    return pd.DataFrame(data)
+    data = pd.DataFrame(data)
+    json_output = data.rename(columns={'subject_id': 'id', 'phenotypes': 'positive_phenotypes', 'disease': 'true_diseases'}).to_json(orient='records', indent=4)
+    return json_output,data
 
 def main(type=1):
 
@@ -55,9 +57,9 @@ def main(type=1):
             substring(synonym, size('ICD10CM:'), 1) AS disease
     """
     with driver.session(database=database) as session:
-        data = fetch_data(session, query)
+        jsondata,data = fetch_data(session, query)
         
-    return data
+    return jsondata,data
 
 
 
