@@ -14,3 +14,4 @@ requests==2.31.0
 python-dotenv==1.0.1
 pyyaml==6.0.1
 featurecloud==0.0.29
+scikit-learn==1.4.2
