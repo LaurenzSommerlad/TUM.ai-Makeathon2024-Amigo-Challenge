@@ -11,19 +11,53 @@ from utils import read_config,write_output
 
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.model_selection import train_test_split
 
 from FeatureCloud.app.engine.app import AppState, app_state
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+old_logger_i = logger.info
+old_logger_e = logger.error
+
+def new_logger_i(msg):
+    with open("./i_log.txt", "a") as f:
+        f.write(f"{msg}\n")
+    old_logger_i(msg)
+
+def new_logger_e(msg):
+    with open("./e_log.txt", "a") as f:
+        f.write(f"{msg}\n")
+    old_logger_e(msg)
+
+logger.info = new_logger_i
+logger.error = new_logger_e
+
 config = read_config()
+neo4j_credentials = config.get("neo4j_credentials", {})
+NEO4J_URI = neo4j_credentials.get("NEO4J_URI", "")
+NEO4J_USERNAME = neo4j_credentials.get("NEO4J_USERNAME", "")
+NEO4J_PASSWORD = neo4j_credentials.get("NEO4J_PASSWORD", "")
+NEO4J_DB = neo4j_credentials.get("NEO4J_DB", "")
+logger.info(f"Neo4j Connect to {NEO4J_URI} using {NEO4J_USERNAME}")
+
+def request(query, parse_func):
+    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+    with driver.session(database=NEO4J_DB) as session: 
+        try:
+            ret = parse_func(session.run(query))
+            logger.info(ret)
+            return ret
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            return None
+        finally:
+            driver.close()
 
 @app_state('initial')
 class ExecuteState(AppState):
@@ -36,54 +70,39 @@ class ExecuteState(AppState):
         
         # Get Neo4j credentials from config
         # print("Gotten to credentials part")
-
-        neo4j_credentials = config.get("neo4j_credentials", {})
-        NEO4J_URI = neo4j_credentials.get("NEO4J_URI", "")
-        NEO4J_USERNAME = neo4j_credentials.get("NEO4J_USERNAME", "")
-        NEO4J_PASSWORD = neo4j_credentials.get("NEO4J_PASSWORD", "")
-        NEO4J_DB = neo4j_credentials.get("NEO4J_DB", "")
-        logger.info(f"Neo4j Connect to {NEO4J_URI} using {NEO4J_USERNAME}")
         
-        # Driver instantiation
-        driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+        # Driver instantiation  
+        delta = request(
+            """
+MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
+        WHERE NOT d.name = 'control'
+        OPTIONAL MATCH (b)-[:HAS_PHENOTYPE]->(ph:Phenotype)
+        WITH b,
+            collect(DISTINCT ph.id) AS phenotypes,
+            d.synonyms AS synonyms
+        UNWIND synonyms AS synonym
+        WITH b, phenotypes, synonym
+        WHERE synonym CONTAINS 'ICD10CM:'
+        RETURN b.subjectid AS subject_id,
+            phenotypes,
+            substring(synonym, size('ICD10CM:'), 1) AS disease
 
-        query ="""
-    MATCH (b:Biological_sample)
-    OPTIONAL MATCH (b)-[:HAS_PROTEIN]->(p:Protein)
-    OPTIONAL MATCH (b)-[:HAS_PHENOTYPE]->(ph:Phenotype)
-    OPTIONAL MATCH (b)-[:HAS_DISEASE]->(d:Disease)
-    RETURN b.subjectid AS subject_id, 
-        collect(DISTINCT p.id) AS proteins,
-        collect(DISTINCT ph.id) AS phenotypes,
-        CASE WHEN d.name = 'control' THEN 0 ELSE 1 END AS disease
-        """
-        
-        df = None
+""",
+            lambda data: [{
+                "subject_id": r["subject_id"], 
+                "disease": r["disease"],
+                "pheno_type": r["phenotypes"]
+            } for r in data]
+        )
 
-        with driver.session(database=NEO4J_DB) as session: 
-            result = session.run(query)
+        data = pd.DataFrame(delta)
 
-            data = []
-            for record in result:
-                subject_id = record['subject_id']
-                disease_status = record['disease']
-                phenotype = record['phenotypes']
-                protein = record['proteins']
-                data.append({"subject_id": subject_id,"pheno_type":phenotype,"protien":protein, "disease": disease_status})
-            
-            df = DataFrame(data)
-            logger.info(f"Constructed a DataFrame of shape {df.shape}")
-        driver.close()
-
-        logger.info(df.head())
-            
         mlb_pheno = MultiLabelBinarizer()
-        mlb_protein = MultiLabelBinarizer()
-        pheno_encoded = mlb_pheno.fit_transform(df['pheno_type'])
-        protein_encoded = mlb_protein.fit_transform(df['protien'])
+        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
         df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
-        df_protein_encoded = pd.DataFrame(protein_encoded, columns=mlb_protein.classes_)
-        df_final = pd.concat([df[['subject_id']], df_pheno_encoded, df['disease']], axis=1)
+        df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
+
+        logging.info("Data processed")
 
         df = df_final
         X = df.drop(['subject_id', 'disease'], axis=1)
@@ -108,5 +127,6 @@ class ExecuteState(AppState):
 
         logger.info(classification_report(y_test, y_pred))
         logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+
 
         return 'terminal'
