@@ -151,6 +151,7 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
         logger.info("Model finished training")
         # Predict the test set
         y_pred = classifier.predict(X_test)
+        y_pred = label_encoder.inverse_transform(y_pred)
         
         
         results_df = pd.DataFrame({
@@ -183,10 +184,7 @@ MATCH (b:Biological_sample)
         )
 
         data = pd.DataFrame(delta)
-
-        #mlb_pheno = MultiLabelBinarizer()
-        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
-        df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
+        df_pheno_encoded = pd.DataFrame(data['pheno_type'], columns=mlb_pheno.classes_)
         df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
 
         logging.info("Data processed")
@@ -211,8 +209,6 @@ MATCH (b:Biological_sample)
             'disease': y_pred
         })
         results_df.to_csv('./predictions_A.csv')
-
-        logger.info(classification_report(y_test, y_pred))
-        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+        logger.info(results_df.to_csv())
 
         return 'terminal'
