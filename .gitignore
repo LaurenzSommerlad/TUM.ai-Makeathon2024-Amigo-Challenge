@@ -9,3 +9,6 @@ config.yml
 #venv Folder
 careforrare/
 data/
+*.csv
+*.json
+__pycache__
