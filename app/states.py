@@ -11,12 +11,11 @@ from utils import read_config,write_output
 
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.model_selection import train_test_split
 
 from FeatureCloud.app.engine.app import AppState, app_state
 
@@ -51,7 +50,9 @@ def request(query, parse_func):
     driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
     with driver.session(database=NEO4J_DB) as session: 
         try:
-            return parse_func(session.run(query))
+            ret = parse_func(session.run(query))
+            logger.info(ret)
+            return ret
         except Exception as e:
             logger.error(f"Error: {e}")
             return None
@@ -70,61 +71,62 @@ class ExecuteState(AppState):
         # Get Neo4j credentials from config
         # print("Gotten to credentials part")
         
-        # Driver instantiation
-        
-
-        edge_types = request(
-            "CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType;",
-            lambda data: [r["relationshipType"] for r in data]
-        )
-        assert edge_types
-
-        """
-        t = edge_types.index("HAS_DISEASE")
-with driver.session(database=database) as session:
-	data = session.run("MATCH (a:Biological_sample)-[r:HAS_DISEASE]->(b) RETURN id(a), id(b)")
-	patients = list(set(r["id(a)"] for r in data))
-	edges += [(r["id(a)"], t, r["id(b)"]) for r in data]
-        """
-        edges = []
-        t = edge_types.index("HAS_DISEASE")
+        # Driver instantiation  
         delta = request(
-            "MATCH (a:Biological_sample)-[r:HAS_DISEASE]->(b) RETURN id(a), id(b)",
-            lambda data: [(r["id(a)"], t, r["id(b)"]) for r in data]
-        )
-        assert delta
-        patients = list(set(r[0] for r in delta))
-        edges += delta
+            """
+MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
+        WHERE NOT d.name = 'control'
+        OPTIONAL MATCH (b)-[:HAS_PHENOTYPE]->(ph:Phenotype)
+        WITH b,
+            collect(DISTINCT ph.id) AS phenotypes,
+            d.synonyms AS synonyms
+        UNWIND synonyms AS synonym
+        WITH b, phenotypes, synonym
+        WHERE synonym CONTAINS 'ICD10CM:'
+        RETURN b.subjectid AS subject_id,
+            phenotypes,
+            substring(synonym, size('ICD10CM:'), 1) AS disease
 
-        """
-        t = edge_types.index("HAS_PROTEIN")
-with driver.session(database=database) as session:
-	data = session.run("MATCH (a:Biological_sample)-[r:HAS_PROTEIN]->(b) RETURN id(a), id(b)")
-	edges += [(r["id(a)"], t, r["id(b)"]) for r in data]
-        """
-        t = edge_types.index("HAS_PROTEIN")
-        delta = request(
-            "MATCH (a:Biological_sample)-[r:HAS_PROTEIN]->(b) RETURN id(a), id(b)",
-            lambda data: [(r["id(a)"], t, r["id(b)"]) for r in data]
+""",
+            lambda data: [{
+                "subject_id": r["subject_id"], 
+                "disease": r["disease"],
+                "pheno_type": r["phenotypes"]
+            } for r in data]
         )
-        assert delta
-        edges += delta
 
-        """
-        t = edge_types.index("HAS_PHENOTYPE")
-with driver.session(database=database) as session:
-	data = session.run("MATCH (a:Biological_sample)-[r:HAS_PHENOTYPE]->(b) RETURN id(a), id(b)")
-	edges += [(r["id(a)"], t, r["id(b)"]) for r in data]
-        """
-        t = edge_types.index("HAS_PHENOTYPE")
-        delta = request(
-            "MATCH (a:Biological_sample)-[r:HAS_PHENOTYPE]->(b) RETURN id(a), id(b)",
-            lambda data: [(r["id(a)"], t, r["id(b)"]) for r in data]
-        )
-        assert delta
-        edges += delta
+        data = pd.DataFrame(delta)
 
-        logger.info(f"{edges.__len__()}, {patients.__len__()}")
+        mlb_pheno = MultiLabelBinarizer()
+        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
+        df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
+        df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
+
+        logging.info("Data processed")
+
+        df = df_final
+        X = df.drop(['subject_id', 'disease'], axis=1)
+        y = df['disease']
+
+        classifier = RandomForestClassifier(n_estimators=3, random_state=42)
+
+        # Split the data
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        classifier.fit(X_train, y_train)
+        logger.info("Model finished training")
+
+        # Predict the test set
+        y_pred = classifier.predict(X_test)
+
+        y_pred = classifier.predict(X_test)
+        results_df = pd.DataFrame({
+            'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
+            'disease': y_pred
+        })
+        results_df.to_csv('predictions.csv')
+
+        logger.info(classification_report(y_test, y_pred))
+        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
 
 
         return 'terminal'
