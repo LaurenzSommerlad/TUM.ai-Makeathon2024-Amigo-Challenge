@@ -16,6 +16,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 
 from FeatureCloud.app.engine.app import AppState, app_state
 
@@ -51,7 +52,7 @@ def request(query, parse_func):
     with driver.session(database=NEO4J_DB) as session: 
         try:
             ret = parse_func(session.run(query))
-            logger.info(ret)
+            logger.info(query)
             return ret
         except Exception as e:
             logger.error(f"Error: {e}")
@@ -71,7 +72,9 @@ class ExecuteState(AppState):
         # Get Neo4j credentials from config
         # print("Gotten to credentials part")
         
-        # Driver instantiation  
+        # Driver instantiation 
+
+        ## TYPE 1
         delta = request(
             """
 MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
@@ -108,6 +111,9 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
         X = df.drop(['subject_id', 'disease'], axis=1)
         y = df['disease']
 
+        label_encoder = LabelEncoder()
+        y = label_encoder.fit_transform(y)
+
         classifier = RandomForestClassifier(n_estimators=3, random_state=42)
 
         # Split the data
@@ -123,10 +129,61 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
             'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
             'disease': y_pred
         })
-        results_df.to_csv('predictions.csv')
+        results_df.to_csv('./predictions_B.csv')
 
         logger.info(classification_report(y_test, y_pred))
         logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
 
+        ## TYPE 0
+        logger.info("Doing type 1 now")
+
+        delta = request(
+            """
+MATCH (b:Biological_sample)
+    OPTIONAL MATCH (b)-[:HAS_PHENOTYPE]->(ph:Phenotype)
+    OPTIONAL MATCH (b)-[:HAS_DISEASE]->(d:Disease)
+    RETURN b.subjectid AS subject_id,
+        collect(DISTINCT ph.id) AS phenotypes,
+        CASE WHEN d.name = 'control' THEN 0 ELSE 1 END AS disease
+""",
+            lambda data: [{
+                "subject_id": r["subject_id"], 
+                "disease": r["disease"],
+                "pheno_type": r["phenotypes"]
+            } for r in data]
+        )
+
+        data = pd.DataFrame(delta)
+
+        mlb_pheno = MultiLabelBinarizer()
+        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
+        df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
+        df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
+
+        logging.info("Data processed")
+
+        df = df_final
+        X = df.drop(['subject_id', 'disease'], axis=1)
+        y = df['disease']
+
+        classifier = RandomForestClassifier(n_estimators=3, random_state=42)
+
+        # Split the data
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        classifier.fit(X_train, y_train)
+        logger.info("Model finished training")
+
+        # Predict the test set
+        y_pred = classifier.predict(X_test)
+
+        y_pred = classifier.predict(X_test)
+        results_df = pd.DataFrame({
+            'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
+            'disease': y_pred
+        })
+        results_df.to_csv('./predictions_A.csv')
+
+        logger.info(classification_report(y_test, y_pred))
+        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
 
         return 'terminal'
