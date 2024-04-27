@@ -61,10 +61,6 @@ def main(type=1):
         
     return jsondata,data
 
-
-
-
-
 def process_data(data):
     mlb_pheno = MultiLabelBinarizer()
     mlb_protein = MultiLabelBinarizer()

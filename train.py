@@ -30,7 +30,7 @@ classifier.fit(X_train, y_train)
 
 # Predict the test set
 y_pred = classifier.predict(X_test)
-results_df = pd.DataFrame({
+results_df = pd.DataFrame({   
     'subject_id': X_test.index,  
     'disease': y_pred
 })
