@@ -1,6 +1,8 @@
 # The Dream Team
 ### Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
 <br>
+![Team Photo](https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge/assets/36761347/78b360be-0c70-4f10-91ef-2664a297fb40)
+
 
 This challenge was part of the TUM.ai Makeathon 2024 provided by CareForeRare Foundation in Cooperation with LMU, Capegini, MI4People, FeatureCloud, Neo4j and Dr. von Hauner Children's Hospital.
 
