@@ -9,16 +9,12 @@ from pandas import DataFrame
 
 from utils import read_config,write_output
 
-import pandas as pd
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-
 from FeatureCloud.app.engine.app import AppState, app_state
+
+import numpy as np
+import torch
+from run import main
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -69,121 +65,92 @@ class ExecuteState(AppState):
         
     def run(self):
         
-        # Get Neo4j credentials from config
-        # print("Gotten to credentials part")
+        """
+        with driver.session(database=database) as session:
+	data = session.run("CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType;")
+	edge_types = [r["relationshipType"] for r in data]
+        """
+        edge_types = request(
+            "CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType;",
+            lambda data: [r["relationshipType"] for r in data]
+        )
+        assert edge_types
+
+        edges = []
+
+        """
+        t = edge_types.index("HAS_DISEASE")
+with driver.session(database=database) as session:
+	data = session.run("MATCH (a:Biological_sample)-[r:HAS_DISEASE]->(b) RETURN id(a), id(b)")
+	patients = list(set(r["id(a)"] for r in data))
+	edges += [(r["id(a)"], t, r["id(b)"]) for r in data]
+"""
+        t = edge_types.index("HAS_DISEASE")
+        data = request(
+            "MATCH (a:Biological_sample)-[r:HAS_DISEASE]->(b) RETURN id(a), id(b)",
+            lambda data: [(r["id(a)"], r["id(b)"]) for r in data]
+        )
+        assert data
+        patients = set(r[0] for r in data)
+        diseases = set(r[1] for r in data)
+        with_disease = [(r[0], t, r[1]) for r in data]
+        edges += with_disease
+
+        """
+        t = edge_types.index("HAS_PROTEIN")
+with driver.session(database=database) as session:
+	data = session.run("MATCH (a:Biological_sample)-[r:HAS_PROTEIN]->(b) RETURN id(a), id(b)")
+	edges += [(r["id(a)"], t, r["id(b)"]) for r in data]
+    """
+        t = edge_types.index("HAS_PROTEIN")
+        delta = request(
+            "MATCH (a:Biological_sample)-[r:HAS_PROTEIN]->(b) RETURN id(a), id(b)",
+            lambda data: [(r["id(a)"], t, r["id(b)"]) for r in data]
+        )
+        assert delta
+        all_patients = set(r[0] for r in delta)
+        edges += delta
+
+        """
+        t = edge_types.index("HAS_PHENOTYPE")
+with driver.session(database=database) as session:
+	data = session.run("MATCH (a:Biological_sample)-[r:HAS_PHENOTYPE]->(b) RETURN id(a), id(b)")
+	edges += [(r["id(a)"], t, r["id(b)"]) for r in data]
+    """
+        t = edge_types.index("HAS_PHENOTYPE")
+        delta = request(
+            "MATCH (a:Biological_sample)-[r:HAS_PHENOTYPE]->(b) RETURN id(a), id(b)",
+            lambda data: [(r["id(a)"], t, r["id(b)"]) for r in data]
+        )
+        assert delta
+        edges += delta
+
+        logger.info(f"{edges.__len__(), len(patients)}")
+
+        complex_format = np.array(edges)
+        kge_model, entity_encoder, relation_encoder = main(complex_format)
+
+        to_check = all_patients.difference(patients)
+        d_n = len(diseases)
+        r_emb = np.tile(
+            relation_encoder.transform([edge_types.index("HAS_DISEASE")])[0],
+            (d_n, 1)
+        )
+        d_emb = np.concatenate([entity_encoder.transform([disease])[0] for disease in diseases], axis=0)
+
+        results = []
+        for patient in to_check:
+            p_emb = np.tile(
+                entity_encoder.transform([patient])[0],
+                (d_n, 1)
+            )
+            inp = torch.from_numpy(np.concatenate([p_emb, r_emb, d_emb], axes=1))
+            res = kge_model(inp)
+            max_res = torch.argmax(res).detach().numpy()
+            disease = diseases[max_res]
+            results.append((patient, disease))
         
-        # Driver instantiation 
-
-        ## TYPE 1
-        delta = request(
-            """
-MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
-        WHERE NOT d.name = 'control'
-        OPTIONAL MATCH (b)-[:HAS_PHENOTYPE]->(ph:Phenotype)
-        WITH b,
-            collect(DISTINCT ph.id) AS phenotypes,
-            d.synonyms AS synonyms
-        UNWIND synonyms AS synonym
-        WITH b, phenotypes, synonym
-        WHERE synonym CONTAINS 'ICD10CM:'
-        RETURN b.subjectid AS subject_id,
-            phenotypes,
-            substring(synonym, size('ICD10CM:'), 1) AS disease
-
-""",
-            lambda data: [{
-                "subject_id": r["subject_id"], 
-                "disease": r["disease"],
-                "pheno_type": r["phenotypes"]
-            } for r in data]
-        )
-
-        data = pd.DataFrame(delta)
-
-        mlb_pheno = MultiLabelBinarizer()
-        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
-        df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
-        df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
-
-        logging.info("Data processed")
-
-        df = df_final
-        X = df.drop(['subject_id', 'disease'], axis=1)
-        y = df['disease']
-
-        label_encoder = LabelEncoder()
-        y = label_encoder.fit_transform(y)
-
-        classifier = RandomForestClassifier(n_estimators=3, random_state=42)
-
-        # Split the data
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        classifier.fit(X_train, y_train)
-        logger.info("Model finished training")
-
-        # Predict the test set
-        y_pred = classifier.predict(X_test)
-
-        y_pred = classifier.predict(X_test)
-        results_df = pd.DataFrame({
-            'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
-            'disease': y_pred
-        })
-        results_df.to_csv('./predictions_B.csv')
-
-        logger.info(classification_report(y_test, y_pred))
-        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
-
-        ## TYPE 0
-        logger.info("Doing type 1 now")
-
-        delta = request(
-            """
-MATCH (b:Biological_sample)
-    OPTIONAL MATCH (b)-[:HAS_PHENOTYPE]->(ph:Phenotype)
-    OPTIONAL MATCH (b)-[:HAS_DISEASE]->(d:Disease)
-    RETURN b.subjectid AS subject_id,
-        collect(DISTINCT ph.id) AS phenotypes,
-        CASE WHEN d.name = 'control' THEN 0 ELSE 1 END AS disease
-""",
-            lambda data: [{
-                "subject_id": r["subject_id"], 
-                "disease": r["disease"],
-                "pheno_type": r["phenotypes"]
-            } for r in data]
-        )
-
-        data = pd.DataFrame(delta)
-
-        mlb_pheno = MultiLabelBinarizer()
-        pheno_encoded = mlb_pheno.fit_transform(data['pheno_type'])
-        df_pheno_encoded = pd.DataFrame(pheno_encoded, columns=mlb_pheno.classes_)
-        df_final = pd.concat([data[['subject_id']], df_pheno_encoded, data['disease']], axis=1)
-
-        logging.info("Data processed")
-
-        df = df_final
-        X = df.drop(['subject_id', 'disease'], axis=1)
-        y = df['disease']
-
-        classifier = RandomForestClassifier(n_estimators=3, random_state=42)
-
-        # Split the data
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        classifier.fit(X_train, y_train)
-        logger.info("Model finished training")
-
-        # Predict the test set
-        y_pred = classifier.predict(X_test)
-
-        y_pred = classifier.predict(X_test)
-        results_df = pd.DataFrame({
-            'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
-            'disease': y_pred
-        })
-        results_df.to_csv('./predictions_A.csv')
-
-        logger.info(classification_report(y_test, y_pred))
-        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+        df = pd.DataFrame(results, columns=["subject_id", "disease"])
+        logging.info(df.to_csv())
 
         return 'terminal'
