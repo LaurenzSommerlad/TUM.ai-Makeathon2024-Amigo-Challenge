@@ -142,7 +142,7 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
         y = df['disease']
         label_encoder = LabelEncoder()
         y = label_encoder.fit_transform(y)
-        classifier = RandomForestClassifier(n_estimators=3, random_state=42)
+        classifier = RandomForestClassifier(n_estimators=100, random_state=42)
         classifier.fit(X, y)
 
         # Split the data
@@ -155,7 +155,7 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
         
         
         results_df = pd.DataFrame({
-            'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
+            'subject_id': df_test['subject_id'],  # or X_test['subject_id'] if 'subject_id' is a column
             'disease': y_pred
         })
         logger.info(results_df.to_csv())
@@ -193,7 +193,7 @@ MATCH (b:Biological_sample)
         X = df.drop(['subject_id', 'disease'], axis=1)
         y = df['disease']
 
-        classifier = RandomForestClassifier(n_estimators=3, random_state=42)
+        classifier = RandomForestClassifier(n_estimators=100, random_state=42)
 
         # # Split the data
         # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -203,9 +203,8 @@ MATCH (b:Biological_sample)
 
         # Predict the test set
         y_pred = classifier.predict(X_test)
-        y_pred = classifier.predict(X_test)
         results_df = pd.DataFrame({
-            'subject_id': X_test.index,  # or X_test['subject_id'] if 'subject_id' is a column
+            'subject_id': df_test['subject_id'], 
             'disease': y_pred
         })
         results_df.to_csv('./predictions_A.csv')
