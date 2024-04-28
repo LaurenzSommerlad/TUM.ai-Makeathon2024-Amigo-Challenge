@@ -159,7 +159,15 @@ MATCH (b:Biological_sample)-[:HAS_DISEASE]->(d:Disease)
         label_encoder = LabelEncoder()
         y = label_encoder.fit_transform(y)
         classifier = RandomForestClassifier(n_estimators=100, random_state=42)
-        classifier.fit(X, y)
+        # classifier.fit(X, y)
+        
+        X_train, X_t, y_train, y_t = train_test_split(X, y, test_size=0.15, random_state=42)
+        classifier.fit(X_train, y_train)
+        # classifier.fit(X_train, y_train)
+        logger.info("Model finished training")
+        y_p = classifier.predict(X_t)
+        logger.info(classification_report(y_t, y_p))
+        logger.info(f"Accuracy: {accuracy_score(y_t, y_p)}")
 
         # Split the data
         # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -215,12 +223,15 @@ MATCH (b:Biological_sample)
 
         classifier = RandomForestClassifier(n_estimators=100, random_state=42)
 
-        # # Split the data
-        # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        classifier.fit(X, y)
+        # Split the data
+        X_train, X_t, y_train, y_t = train_test_split(X, y, test_size=0.15, random_state=42)
+        classifier.fit(X_train, y_train)
         # classifier.fit(X_train, y_train)
         logger.info("Model finished training")
-
+        y_p = classifier.predict(X_t)
+        logger.info(classification_report(y_t, y_p))
+        logger.info(f"Accuracy: {accuracy_score(y_t, y_p)}")
+        
         # Predict the test set
         y_pred = classifier.predict(X_test)
         results_df = pd.DataFrame({
