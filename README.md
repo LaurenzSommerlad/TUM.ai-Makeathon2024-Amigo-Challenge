@@ -1,8 +1,34 @@
-# PersonalizedMedicine
+# The Dream Team
+### Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
+<br>
 
+This challenge was part of the TUM.ai Makeathon 2024 provided by CareForeRare Foundation in Cooperation with LMU, Capegini, MI4People, FeatureCloud, Neo4j and Dr. von Hauner Children's Hospital.
 
+#### Inspiration
+We chose this federated learning-based graph neural network project because of the value and impact it could have in rare disease prediction among children across the world.
+
+#### What it does
+It accurately predicts if a child is healthy or diagnosed with a rare disease. Moreover, we can predict the patients’ disease categories based on the first letter of the ICD-10 code system.
+
+#### How we built it
+If a patient has one or more phenotypes and genes, we used a random forest to perform classification. We also implemented the first notions of graph neural networks. The application is made with Python and pushed to FeatureCloud inside a docker container.
+
+#### Challenges we ran into
+The first challenge was to get the docker container running on the FeatureCloud infrastructure. We faced many timeout issues related to our neo4j queries. Furthermore, we did not have direct access to the production data. This means we could initially only explore and train on the synthetic dataset, which was unfortunately not relatable. Another challenge was retrieving the logs from the feature cloud, which needed to be sent always manually through Discord.
+
+#### Accomplishments that we are proud of
+We were the first team with a submission and working solution, having good initial scores and utilizing innovative ML algorithms to perform binary and multi-label classification. We also implemented a Graph Machine Learning approach on a separate branch, which unfortunately could not yet be tested due to infrastructure limitations.
+
+#### What we learned
+How to work with Cypher to query the graph-based database neo4j. How to work with the FeatureCloud infrastructure and Federated Machine Learning, classification algorithms, graph neural networks, and ultimately the medical context that is the prerequisite of understanding the correlations between genes, proteins, phenotypes, and the respective diseases.
 to start development you require python and a Docker Setup.
 
+#### Authors
+[Laurenz Sommerlad](https://www.linkedin.com/in/laurenzsommerlad/) <br>
+[Sandhanakrishnan Ravichandran](https://www.linkedin.com/in/sandhanakrishnanr/) <br>
+[Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
+[Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
+### FeatureCloud Setup
 The Following example solution is build on https://github.com/FeatureCloud/app-round/
 
 ```
