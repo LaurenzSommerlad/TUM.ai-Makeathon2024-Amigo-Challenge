@@ -1,5 +1,5 @@
 # The Dream Team
-### Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
+## Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
 <br>
 
 ![Team Photo](https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge/assets/36761347/78b360be-0c70-4f10-91ef-2664a297fb40)
@@ -7,30 +7,33 @@
 
 This challenge was part of the TUM.ai Makeathon 2024 provided by CareForeRare Foundation in Cooperation with LMU, Capegini, MI4People, FeatureCloud, Neo4j and Dr. von Hauner Children's Hospital.
 
-#### Inspiration
+### Inspiration
 We chose this federated learning-based graph neural network project because of the value and impact it could have in rare disease prediction among children across the world.
 
-#### What it does
+### What it does
 It accurately predicts if a child is healthy or diagnosed with a rare disease. Moreover, we can predict the patients’ disease categories based on the first letter of the ICD-10 code system.
 
-#### How we built it
+### How we built it
 If a patient has one or more phenotypes and genes, we used a random forest to perform classification. We also implemented the first notions of graph neural networks. The application is made with Python and pushed to FeatureCloud inside a docker container.
 
-#### Challenges we ran into
+### Challenges we ran into
 The first challenge was to get the docker container running on the FeatureCloud infrastructure. We faced many timeout issues related to our neo4j queries. Furthermore, we did not have direct access to the production data. This means we could initially only explore and train on the synthetic dataset, which was unfortunately not relatable. Another challenge was retrieving the logs from the feature cloud, which needed to be sent always manually through Discord.
 
-#### Accomplishments that we are proud of
+### Accomplishments that we are proud of
 We were the first team with a submission and working solution, having good initial scores and utilizing innovative ML algorithms to perform binary and multi-label classification. We also implemented a Graph Machine Learning approach on a separate branch, which unfortunately could not yet be tested due to infrastructure limitations.
 
-#### What we learned
+### What we learned
 How to work with Cypher to query the graph-based database neo4j. How to work with the FeatureCloud infrastructure and Federated Machine Learning, classification algorithms, graph neural networks, and ultimately the medical context that is the prerequisite of understanding the correlations between genes, proteins, phenotypes, and the respective diseases.
 to start development you require python and a Docker Setup.
 
-#### Authors
-[Laurenz Sommerlad](https://www.linkedin.com/in/laurenzsommerlad/) <br>
+## Authors
+<a href="https://laurenzsommerlad.com" target="_blank">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white"/></a><br>
 [Sandhanakrishnan Ravichandran](https://www.linkedin.com/in/sandhanakrishnanr/) <br>
 [Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
 [Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
+
+[https://devpost.com/software/the-dream-team-7uik58](https://devpost.com/software/the-dream-team-7uik58)
+
 ### FeatureCloud Setup
 The Following example solution is build on https://github.com/FeatureCloud/app-round/
 
@@ -74,8 +77,22 @@ https://featurecloud.ai/developers
 
 ```
 
-# How to run this application with docker-compose. 
+### How to run this application with docker-compose. 
 
 ```docker-compose up -d ```
 
 This command performs similar actions to the previous lengthy Docker command. It builds the Docker image and tags it as featurecloud.ai/dreamteam:latest, sets up local volume mappings, and opens the corresponding ports.
+
+## Contact ##
+<a href="https://laurenzsommerlad.com" target="_blank" rel="me">
+  <img src="https://img.shields.io/static/v1?label=Link&message=PersonalWebsite&color=blueviolet"/>
+</a>
+<a href="https://www.linkedin.com/in/laurenzsommerlad" target="_blank" rel="me">
+  <img src="https://img.shields.io/static/v1?label=Link&message=LinkedIn&color=0062b1"/>
+</a>
+<a href="https://x.com/Lauros_World" target="_blank" rel="me">
+  <img src="https://img.shields.io/static/v1?label=Link&message=X/ Twitter&color=blue"/>
+</a>
+<a href="mailto:laurenz.sommerlad@tum-ai.com" target="_blank" rel="me">
+  <img src="https://img.shields.io/static/v1?label=Link&message=Email&color=green"/>
+</a>
