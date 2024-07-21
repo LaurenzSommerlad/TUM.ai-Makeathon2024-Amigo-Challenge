@@ -5,7 +5,7 @@
 ![Team Photo](https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge/assets/36761347/78b360be-0c70-4f10-91ef-2664a297fb40)
 
 
-This challenge was part of the TUM.ai Makeathon 2024 provided by CareForeRare Foundation in Cooperation with LMU, Capegini, MI4People, FeatureCloud, Neo4j and Dr. von Hauner Children's Hospital.
+This challenge was part of the <a href="https://makeathon.tum-ai.com" target="_blank">TUM.ai Makeathon 2024</a> provided by CareForeRare Foundation in Cooperation with LMU, Capegini, MI4People, FeatureCloud, Neo4j and Dr. von Hauner Children's Hospital.
 
 ### Inspiration
 We chose this federated learning-based graph neural network project because of the value and impact it could have in rare disease prediction among children across the world.
@@ -27,7 +27,7 @@ How to work with Cypher to query the graph-based database neo4j. How to work wit
 to start development you require python and a Docker Setup.
 
 ## Authors
-<a href="https://laurenzsommerlad.com" target="_blank">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white"/></a><br>
+<a href="https://laurenzsommerlad.com" target="_blank" rel="me">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank" rel="me"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white"/></a><br>
 [Sandhanakrishnan Ravichandran](https://www.linkedin.com/in/sandhanakrishnanr/) <br>
 [Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
 [Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
@@ -82,6 +82,8 @@ https://featurecloud.ai/developers
 ```docker-compose up -d ```
 
 This command performs similar actions to the previous lengthy Docker command. It builds the Docker image and tags it as featurecloud.ai/dreamteam:latest, sets up local volume mappings, and opens the corresponding ports.
+
+<a href="https://www.tum-ai.com" target="_blank">TUM.ai e.V.</a>
 
 ## Contact ##
 <a href="https://laurenzsommerlad.com" target="_blank" rel="me">
