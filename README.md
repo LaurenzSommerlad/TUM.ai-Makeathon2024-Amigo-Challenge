@@ -1,5 +1,5 @@
-# The Dream Team
-## Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
+## The Dream Team
+### Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
 <br>
 
 ![Team Photo](https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge/assets/36761347/78b360be-0c70-4f10-91ef-2664a297fb40)
@@ -32,7 +32,11 @@ to start development you require python and a Docker Setup.
 [Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
 [Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
 
-[https://devpost.com/software/the-dream-team-7uik58](https://devpost.com/software/the-dream-team-7uik58)
+## Links
+
+<a href="https://devpost.com/software/the-dream-team-7uik58" target="_blank">Devpost Submission</a><br>
+<a href="https://tum-ai.notion.site/AI-in-Medicine-Project-AMIGO-d882e781fbfc4056b474fee54cdb0b2f" target="_blank">AI in Medicine: Project AMIGO Challenge & Instructions</a><br>
+<a href="https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge" target="_blank">Github Repo</a>
 
 ### FeatureCloud Setup
 The Following example solution is build on https://github.com/FeatureCloud/app-round/
