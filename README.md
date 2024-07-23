@@ -1,4 +1,9 @@
-## The Dream Team
+<a href="https://laurenzsommerlad.com"><img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=About.me&logoColor=white" alt="Personal Website"/></a>
+<a href="https://github.laurenzsommerlad.com"><img src="https://img.shields.io/badge/github%20pages-121013?style=for-the-badge&logo=github&logoColor=white" alt="Github Pages - About Me"/></a>
+<a href="https://github.com/LaurenzSommerlad" target="_blank"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Profile"/></a>
+<a href="https://gitlab.com/LaurenzSommerlad" target="_blank"><img src="https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white" alt="GitLab Profile"/></a>
+
+## The Dream Team - Hackathon 2nd Place AI in Medicine Challenge 🥈
 ### Detection of rare child diseases by applying graph machine learning to a remote dataset with federated machine learning
 <br>
 
@@ -27,16 +32,16 @@ How to work with Cypher to query the graph-based database neo4j. How to work wit
 to start development you require python and a Docker Setup.
 
 ## Authors
-<a href="https://laurenzsommerlad.com" target="_blank" rel="me">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank" rel="me"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white"/></a><br>
-[Sandhanakrishnan Ravichandran](https://www.linkedin.com/in/sandhanakrishnanr/) <br>
-[Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
-[Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
+- <a href="https://laurenzsommerlad.com" target="_blank" rel="me">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank" rel="me"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white"/></a><br>
+- [Sandhanakrishnan Ravichandran](https://www.linkedin.com/in/sandhanakrishnanr/) <br>
+- [Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
+- [Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
 
-## Links
+## Project Links
 
-<a href="https://devpost.com/software/the-dream-team-7uik58" target="_blank">Devpost Submission</a><br>
-<a href="https://tum-ai.notion.site/AI-in-Medicine-Project-AMIGO-d882e781fbfc4056b474fee54cdb0b2f" target="_blank">AI in Medicine: Project AMIGO Challenge & Instructions</a><br>
-<a href="https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge" target="_blank">Github Repo</a>
+- <a href="https://devpost.com/software/the-dream-team-7uik58" target="_blank">Devpost Submission</a><br>
+- <a href="https://tum-ai.notion.site/AI-in-Medicine-Project-AMIGO-d882e781fbfc4056b474fee54cdb0b2f" target="_blank">AI in Medicine: Project AMIGO Challenge & Instructions</a><br>
+- <a href="https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2024-Amigo-Challenge" target="_blank">Github Repo</a>
 
 ### FeatureCloud Setup
 The Following example solution is build on https://github.com/FeatureCloud/app-round/
@@ -87,18 +92,22 @@ https://featurecloud.ai/developers
 
 This command performs similar actions to the previous lengthy Docker command. It builds the Docker image and tags it as featurecloud.ai/dreamteam:latest, sets up local volume mappings, and opens the corresponding ports.
 
-<a href="https://www.tum-ai.com" target="_blank">TUM.ai e.V.</a>
+## More Hackathons
+- <a href="https://makeathon.tum-ai.com" target="_blank">TUM.ai Makeathon</a> 2023 Applied AI Challenge
+  - Description: web-based chatbot that combines the strengths of ChatGPT, Cohere Summarizer, and a detailed questionnaire to ideate on AI use cases and business models
+  - <a href="https://devpost.com/software/appliedai_canai" target="_blank" rel="nofollow noopener noreferrer">Devpost Submission</a>
+  - <a href="https://github.com/LaurenzSommerlad/tum.ai-makeathon2023-frontend" target="_blank">Gatsby Frontend with Tailwind CSS</a>
+  - <a href="https://github.com/LaurenzSommerlad/TUM.ai-Makeathon2023-API-Endpoint/" target="_blank">FastAPI Backend</a>
+
+Organized by <a href="https://www.tum-ai.com" target="_blank">TUM.ai e.V.</a>
 
 ## Contact ##
-<a href="https://laurenzsommerlad.com" target="_blank" rel="me">
-  <img src="https://img.shields.io/static/v1?label=Link&message=PersonalWebsite&color=blueviolet"/>
-</a>
-<a href="https://www.linkedin.com/in/laurenzsommerlad" target="_blank" rel="me">
-  <img src="https://img.shields.io/static/v1?label=Link&message=LinkedIn&color=0062b1"/>
-</a>
-<a href="https://x.com/Lauros_World" target="_blank" rel="me">
-  <img src="https://img.shields.io/static/v1?label=Link&message=X/ Twitter&color=blue"/>
-</a>
-<a href="mailto:laurenz.sommerlad@tum-ai.com" target="_blank" rel="me">
-  <img src="https://img.shields.io/static/v1?label=Link&message=Email&color=green"/>
-</a>
+<a href="https://laurenzsommerlad.com" rel="me"><img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=About.me&logoColor=white" alt="Personal Website"/></a>
+<a href="https://www.linkedin.com/in/laurenzsommerlad" target="_blank" rel="me"><img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+<a href="https://x.com/Lauros_World" target="_blank" rel="me"><img src="https://img.shields.io/badge/X-%23000000.svg?style=for-the-badge&logo=X&logoColor=white" alt="X (Former Twitter)"/></a>
+<a href="https://www.instagram.com/laurenzsommerlad/" target="_blank" rel="me"><img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white" alt="Instagram"/></a>
+<a href="https://www.threads.net/@laurenzsommerlad" target="_blank" rel="me"><img src="https://img.shields.io/badge/Threads-000000?style=for-the-badge&logo=Threads&logoColor=white" alt="Threads"/></a>
+<a href="https://www.youtube.com/@LaurenzSommerlad" target="_blank" rel="me"><img src="https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white" alt="YouTube Channel"/></a>
+<a href="https://www.facebook.com/LaurenzSommerlad.official/" target="_blank" rel="me"><img src="https://img.shields.io/badge/Facebook-%231877F2.svg?style=for-the-badge&logo=Facebook&logoColor=white" alt="Facebook"/></a>
+<a href="https://mastodon.social/@LaurenzSommerlad" target="_blank" rel="me"><img src="https://img.shields.io/badge/-MASTODON-%232B90D9?style=for-the-badge&logo=mastodon&logoColor=white" alt="Mastodon"/></a>
+<a href="https://linktr.ee/LaurenzSommerlad" target="_blank" rel="me"><img src="https://img.shields.io/badge/linktree-1de9b6?style=for-the-badge&logo=linktree&logoColor=white" alt="Linktree"/></a>
