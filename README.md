@@ -32,7 +32,7 @@ How to work with Cypher to query the graph-based database neo4j. How to work wit
 to start development you require python and a Docker Setup.
 
 ## Authors
-- <a href="https://laurenzsommerlad.com" target="_blank" rel="me">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank" rel="me"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white"/></a><br>
+- <a href="https://laurenzsommerlad.com" target="_blank">Laurenz Sommerlad</a> <a href="https://www.linkedin.com/in/laurenzsommerlad/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-0077B5?logo=linkedin&logoColor=white" alt="LinkedIn"/></a><br>
 - [Sandhanakrishnan Ravichandran](https://www.linkedin.com/in/sandhanakrishnanr/) <br>
 - [Roman Mishchuk](https://www.linkedin.com/in/roman-mishchuk-0ab260bb/) <br>
 - [Martin Mohammed](https://www.linkedin.com/in/martin-mohammed-30019a207/)
